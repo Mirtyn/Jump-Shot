@@ -27,8 +27,8 @@ public class Player : ProjectBehaviour
     private float targetTimeScaleChangeSpeed = 8f;
     private float minTargetTimeScale = 0.05f;
     private float maxTargetTimeScale = 1f;
-    private int numBullets = 4;
-    private int maxBullets = 4;
+    private int numBullets = 100;
+    private int maxBullets = 100;
     private int numSpecialBullets = 2;
     private int maxSpecialBullets = 2;
 
@@ -159,6 +159,7 @@ public class Player : ProjectBehaviour
 
         if (refilBulletsDelta >= maxRefilBullets)
         {
+            refilBulletsDelta = 0;
             if (numBullets < maxBullets)
             {
                 numBullets++;
@@ -167,6 +168,7 @@ public class Player : ProjectBehaviour
 
         if (refilSpecialBulletsDelta >= maxRefilSpecialBullets)
         {
+            refilSpecialBulletsDelta = 0;
             if (numSpecialBullets < maxSpecialBullets)
             {
                 numSpecialBullets++;
@@ -319,10 +321,10 @@ public class Player : ProjectBehaviour
     {
         if (!mouse1Up) return;
 
-        if (numSpecialBullets <= 0)
-        {
-            return;
-        }
+        //if (numSpecialBullets <= 0)
+        //{
+        //    return;
+        //}
 
         Debug.Log("Up");
 
