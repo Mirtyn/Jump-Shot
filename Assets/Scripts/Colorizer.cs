@@ -1,6 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Drawing;
 using UnityEngine;
+using Color = UnityEngine.Color;
 
 public class Colorizer : ProjectBehaviour
 {
@@ -11,6 +13,10 @@ public class Colorizer : ProjectBehaviour
     private void Awake()
     {
         spriteRenderer = GetComponent<SpriteRenderer>();
+        if (TryGetComponent<BoxCollider2D>(out BoxCollider2D boxCollider2D))
+        {
+            boxCollider2D.size = spriteRenderer.size;
+        }
 
         if (TryGetComponent<ParallaxEffect>(out var parallaxEffect))
         {

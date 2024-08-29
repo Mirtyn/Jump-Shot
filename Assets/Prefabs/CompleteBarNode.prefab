@@ -3736,7 +3736,7 @@ ParticleSystem:
         m_NumAlphaKeys: 2
     range: {x: 40, y: 0}
   CollisionModule:
-    enabled: 1
+    enabled: 0
     serializedVersion: 4
     type: 1
     collisionMode: 1

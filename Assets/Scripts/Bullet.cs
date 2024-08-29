@@ -7,6 +7,7 @@ public class Bullet : MonoBehaviour
     private float speed = 30f;
     private float damage = 30f;
     private Transform thisTransform;
+    private bool hit = false;
     [SerializeField] private Transform visual;
     [SerializeField] private ParticleSystem normalParticle;
     [SerializeField] private ParticleSystem specialParticle;
@@ -31,26 +32,51 @@ public class Bullet : MonoBehaviour
         }
     }
 
-    private void FixedUpdate()
+    private void Update()
     {
+        if (this.hit) return;
         Vector3 pos = thisTransform.position;
-        pos += thisTransform.right * speed * Time.fixedDeltaTime;
-        var hit = Physics2D.Raycast(thisTransform.position, thisTransform.right, speed * Time.fixedDeltaTime);
+        pos += thisTransform.right * speed * Time.deltaTime;
+        var hits = Physics2D.RaycastAll(thisTransform.position, thisTransform.right, speed * Time.deltaTime);
 
-        if (hit.collider == null || hit.transform == thisTransform)
+        RaycastHit hit = new RaycastHit();
+
+        for (int j = 0; j < hits.Length; j++)
         {
-            thisTransform.position = pos;
+            if (hits[j].transform != thisTransform && hits[j].transform != null && !hits[j].transform.CompareTag("Pickup"))
+            {
+                pos = hits[j].point;
+                thisTransform.position = pos;
+                Hit(hits[j]);
+                return;
+            }
         }
-        else
-        {
-            pos = hit.point;
-            thisTransform.position = pos;
-            Hit(hit);
-        }
+
+
+        thisTransform.position = pos;
+
+        //if (hits.collider == null || hits.transform == thisTransform)
+        //{
+        //    thisTransform.position = pos;
+        //}
+        //else
+        //{
+        //    pos = hits.point;
+        //    thisTransform.position = pos;
+        //    Hit(hits);
+        //}
     }
 
     private void Hit(RaycastHit2D hit)
     {
+        this.hit = true;
+
+        if (hit.transform.CompareTag("Enemy"))
+        {
+            hit.transform.GetComponent<BaseEnemy>().Damage(damage, thisTransform.right * speed);
+        }
+        GetComponent<BoxCollider2D>().enabled = false;
+
         normalParticle.Stop();
         specialParticle.Stop();
         Destroy(gameObject, 1f);

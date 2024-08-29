@@ -27,20 +27,16 @@ public class Player : ProjectBehaviour
     private float targetTimeScaleChangeSpeed = 8f;
     private float minTargetTimeScale = 0.05f;
     private float maxTargetTimeScale = 1f;
-    private int numBullets = 100;
-    private int maxBullets = 100;
-    private int numSpecialBullets = 2;
-    private int maxSpecialBullets = 2;
+    private int numBullets = 20;
+    private int maxBullets = 20;
 
     private bool onGround = false;
 
     private float refilBulletsDelta = 0f;
-    private float maxRefilBullets = 0.5f;
-    private float refilSpecialBulletsDelta = 0f;
-    private float maxRefilSpecialBullets = 1.3f;
+    private float maxRefilBullets = 1f;
 
     [SerializeField] private TMP_Text bulletsText;
-    [SerializeField] private TMP_Text specialBulletsText;
+
 
     private DrawMeshHandler drawMeshHandler;
 
@@ -48,6 +44,13 @@ public class Player : ProjectBehaviour
     [SerializeField] private ParticleSystem gunShotSpecial;
     [SerializeField] private ParticleSystem gunShotOverheatNormal;
     [SerializeField] private ParticleSystem gunShotOverheatNotNoraml;
+
+    [SerializeField] private ParticleSystem deathParticle;
+    private bool stopCam = false;
+    private bool died = false;
+    [SerializeField] private AudioSource death;
+    [SerializeField] private AudioSource shot;
+    [SerializeField] private AudioSource pop;
 
     private void Awake()
     {
@@ -103,15 +106,23 @@ public class Player : ProjectBehaviour
 
         TryRefillBullets();
         UpdateText();
+
         Vector3 pos = thisTransform.position;
         pos.z = -10f;
-        mainCam.transform.position = pos;
+        if (!stopCam)
+        {
+            mainCam.transform.position = pos;
+        }
+
+        if (thisTransform.position.y < -70f)
+        {
+            FallDeath();
+        }
     }
 
     private void UpdateText()
     {
-        bulletsText.text = numBullets.ToString();
-        specialBulletsText.text = numSpecialBullets.ToString();
+        bulletsText.text = "Bullets: " + numBullets.ToString();
     }
 
     private void CheckForGround()
@@ -150,12 +161,10 @@ public class Player : ProjectBehaviour
         if (!onGround)
         {
             refilBulletsDelta = 0f;
-            refilSpecialBulletsDelta = 0f;
             return;
         }
 
         refilBulletsDelta += Time.deltaTime;
-        refilSpecialBulletsDelta += Time.deltaTime;
 
         if (refilBulletsDelta >= maxRefilBullets)
         {
@@ -163,15 +172,6 @@ public class Player : ProjectBehaviour
             if (numBullets < maxBullets)
             {
                 numBullets++;
-            }
-        }
-
-        if (refilSpecialBulletsDelta >= maxRefilSpecialBullets)
-        {
-            refilSpecialBulletsDelta = 0;
-            if (numSpecialBullets < maxSpecialBullets)
-            {
-                numSpecialBullets++;
             }
         }
     }
@@ -188,7 +188,7 @@ public class Player : ProjectBehaviour
 
         if (mouse1Held)
         {
-            dir = gunTransform.InverseTransformPoint(mainCam.ScreenToWorldPoint(fixedTargetPos));
+            dir = gunTransform.InverseTransformPoint(fixedTargetPos);
         }
         else
         {
@@ -247,7 +247,7 @@ public class Player : ProjectBehaviour
     {
         if (!mouse1Down) return;
 
-        if (numSpecialBullets <= 0)
+        if (numBullets <= 0)
         {
             return;
         }
@@ -256,7 +256,7 @@ public class Player : ProjectBehaviour
         Debug.Log("Down");
         drawMeshHandler.Run();
 
-        fixedTargetPos = mousePos;
+        fixedTargetPos = mainCam.ScreenToWorldPoint(mousePos);
 
         targetTimeScale = minTargetTimeScale;
     }
@@ -279,7 +279,7 @@ public class Player : ProjectBehaviour
     {
         if (!mouse1Held) return;
 
-        if (numSpecialBullets <= 0)
+        if (numBullets <= 0)
         {
             return;
         }
@@ -311,7 +311,7 @@ public class Player : ProjectBehaviour
 
         Shoot();
 
-        rb.AddForce(gunTransform.right * -14f * realtimeMouse0Held, ForceMode2D.Impulse);
+        rb.AddForce(gunTransform.right * -11f * realtimeMouse0Held, ForceMode2D.Impulse);
 
         mouse0Held = false;
         realtimeMouse0Held = 0f;
@@ -344,17 +344,18 @@ public class Player : ProjectBehaviour
         Vector2 pos = gunTransform.position + gunTransform.right * 1.2f;
         gunShot.Play();
         var obj = Instantiate(GameManager.BulletPrefab, pos, gunTransform.rotation);
+        shot.Play();
         obj.GetComponent<Bullet>().SetStats(35f * realtimeMouse0Held, 4 * realtimeMouse0Held, false, new Vector3(0.8f, 0.3f, 1f));
     }
 
     private void ShootSpecial()
     {
-        numSpecialBullets--;
+        numBullets--;
         Vector2 pos = gunTransform.position + gunTransform.right * 1.2f;
         gunShotSpecial.Play();
         var obj = Instantiate(GameManager.BulletPrefab, pos, gunTransform.rotation);
-
-        obj.GetComponent<Bullet>().SetStats(40f, 10f, true, new Vector3(1.4f, 0.5f, 1f));
+        shot.Play();
+        obj.GetComponent<Bullet>().SetStats(34f, 40f, true, new Vector3(1.4f, 0.5f, 1f));
     }
 
     private void DrawMeshHandler_OnCompleted(object sender, System.EventArgs e)
@@ -368,5 +369,49 @@ public class Player : ProjectBehaviour
         rb.AddForce(gunTransform.right * -14f, ForceMode2D.Impulse);
 
         ShootSpecial();
+    }
+
+    public void Die()
+    {
+        if (died) return;
+        died = true;
+        Debug.Log("Death");
+
+        Invoke(nameof(ReloadLevel), 1f);
+
+        GameManager.StopTime = true;
+
+        this.thisTransform.GetChild(0).gameObject.SetActive(false); 
+        gunTransform.gameObject.SetActive(false);
+
+        deathParticle.Play();
+        death.Play();
+    }
+
+    public void FallDeath()
+    {
+        stopCam = true;
+
+        GameManager.StopTime = true;
+        Invoke(nameof(Die), 0.4f);
+    }
+
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        if (collision.transform.CompareTag("Pickup"))
+        {
+            Destroy(collision.gameObject);
+            numBullets++;
+            numBullets++;
+            numBullets++;
+            numBullets++;
+            numBullets++;
+            pop.Play();
+        }
+
+        if (collision.transform.CompareTag("Enemy") || collision.transform.CompareTag("EnemyBullet"))
+        {
+            Die();
+        }
     }
 }

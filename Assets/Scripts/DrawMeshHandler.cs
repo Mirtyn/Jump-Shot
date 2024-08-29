@@ -7,6 +7,7 @@ public class DrawMeshHandler
 {
     private DrawMesh currentDrawMesh;
     private List<DrawMesh> drawMeshes = new List<DrawMesh>();
+    private List<int> bucketList = new List<int>();
 
     private int currentIndex;
     private float currentDistance;
@@ -30,9 +31,9 @@ public class DrawMeshHandler
         };
         List<DrawPoint> points2 = new List<DrawPoint>
         {
-            new DrawPoint(new Vector2(-0.4f, -1)* 5),
-            new DrawPoint(new Vector2(-0.4f, 1)* 5),
-            new DrawPoint(new Vector2(0.1f, -0.4f)* 5)
+            new DrawPoint(new Vector2(-0.5f, -1)* 5),
+            new DrawPoint(new Vector2(-0.5f, 1)* 5),
+            new DrawPoint(new Vector2(0.5f, -0f)* 5)
         };
         List<DrawPoint> points3 = new List<DrawPoint>
         {
@@ -41,10 +42,42 @@ public class DrawMeshHandler
             new DrawPoint(new Vector2(-0.5f, 1)* 5),
             new DrawPoint(new Vector2(0.5f, 1)* 5)
         };
+        List<DrawPoint> points4 = new List<DrawPoint>
+        {
+            new DrawPoint(new Vector2(-0.5f, -1) * 5),
+            new DrawPoint(new Vector2(-0.5f, 1)* 5),
+            new DrawPoint(new Vector2(0.5f, 1)* 5),
+            new DrawPoint(new Vector2(0.5f, -1)* 5)
+        };
+        List<DrawPoint> points5 = new List<DrawPoint>
+        {
+            new DrawPoint(new Vector2(-0.5f, -1) * 5),
+            new DrawPoint(new Vector2(0.5f, 1)* 5),
+            new DrawPoint(new Vector2(-0.5f, 1)* 5),
+            new DrawPoint(new Vector2(0.5f, -1)* 5)
+        };
 
         drawMeshes.Add(CreateDrawMesh(points1));
         drawMeshes.Add(CreateDrawMesh(points2));
         drawMeshes.Add(CreateDrawMesh(points3));
+        drawMeshes.Add(CreateDrawMesh(points4));
+        drawMeshes.Add(CreateDrawMesh(points5));
+
+        for (int i = 0; i < drawMeshes.Count; i++)
+        {
+            bucketList.Add(i);
+        }
+
+        int n = bucketList.Count;
+        
+        while (n > 1)
+        {
+            n--;
+            int k = Random.Range(0, n + 1);
+            int value = bucketList[k];
+            bucketList[k] = bucketList[n];
+            bucketList[n] = value;
+        }
     }
 
     public DrawMesh CreateDrawMesh(List<DrawPoint> drawPoints)
@@ -71,7 +104,26 @@ public class DrawMeshHandler
 
     public void Run()
     {
-        int rndNum = Random.Range(0, drawMeshes.Count);
+        if (bucketList.Count == 0)
+        {
+            for (int i = 0; i < drawMeshes.Count; i++)
+            {
+                bucketList.Add(i);
+            }
+
+            int n = bucketList.Count;
+
+            while (n > 1)
+            {
+                n--;
+                int k = Random.Range(0, n + 1);
+                int value = bucketList[k];
+                bucketList[k] = bucketList[n];
+                bucketList[n] = value;
+            }
+        }
+
+        int rndNum = bucketList[0];
         currentDrawMesh = drawMeshes[rndNum];
 
         currentIndex = 0;
@@ -108,6 +160,7 @@ public class DrawMeshHandler
             else
             {
                 currentDrawMesh = null;
+                bucketList.RemoveAt(0);
                 OnCompleted?.Invoke(this, EventArgs.Empty);
                 return;
             }
