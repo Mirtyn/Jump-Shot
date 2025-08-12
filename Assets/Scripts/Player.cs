@@ -87,6 +87,7 @@ public class Player : ProjectBehaviour
 
         Debug.Log("Time scale: " + Time.timeScale);
 
+        if (died) return;
         GetMousePos();
 
         SetGunDirection();
@@ -107,11 +108,11 @@ public class Player : ProjectBehaviour
         TryRefillBullets();
         UpdateText();
 
-        Vector3 pos = thisTransform.position;
-        pos.z = -10f;
+        //Vector3 pos = thisTransform.position;
+        //pos.z = -10f;
         if (!stopCam)
         {
-            mainCam.transform.position = pos;
+            //mainCam.transform.position = pos;
         }
 
         if (thisTransform.position.y < -70f)
@@ -345,7 +346,7 @@ public class Player : ProjectBehaviour
         gunShot.Play();
         var obj = Instantiate(GameManager.BulletPrefab, pos, gunTransform.rotation);
         shot.Play();
-        obj.GetComponent<Bullet>().SetStats(35f * realtimeMouse0Held, 4 * realtimeMouse0Held, false, new Vector3(0.8f, 0.3f, 1f));
+        obj.GetComponent<Bullet>().SetStats(35f * realtimeMouse0Held, 4 * realtimeMouse0Held, false, new Vector3(.8f, .8f, 1f));
     }
 
     private void ShootSpecial()
@@ -355,7 +356,7 @@ public class Player : ProjectBehaviour
         gunShotSpecial.Play();
         var obj = Instantiate(GameManager.BulletPrefab, pos, gunTransform.rotation);
         shot.Play();
-        obj.GetComponent<Bullet>().SetStats(34f, 40f, true, new Vector3(1.4f, 0.5f, 1f));
+        obj.GetComponent<Bullet>().SetStats(34f, 40f, true, new Vector3(1.5f, 1.5f, 1f));
     }
 
     private void DrawMeshHandler_OnCompleted(object sender, System.EventArgs e)

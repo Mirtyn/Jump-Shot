@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class Gunner : BaseEnemy
@@ -38,7 +36,7 @@ public class Gunner : BaseEnemy
             //gunShot.Play();
             shot.Play();
             var obj = Instantiate(GameManager.EnemyBulletPrefab, pos, Quaternion.identity);
-            obj.GetComponent<EnemyBullet>().SetStats(10f, 2, new Vector3(0.5f, 0.3f, 1f), playerDir);
+            obj.GetComponent<EnemyBullet>().SetStats(10f, 2, new Vector3(1f, 1f, 1f), playerDir);
         }
 
         return false;

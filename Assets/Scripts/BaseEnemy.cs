@@ -1,7 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
-using Unity.Burst.CompilerServices;
-using Unity.VisualScripting;
 using UnityEngine;
 
 public abstract class BaseEnemy : ProjectBehaviour
@@ -275,7 +271,7 @@ public abstract class BaseEnemy : ProjectBehaviour
             deathAudio.Play();
         }
 
-        Destroy(gameObject, 1f);
+        Destroy(gameObject);
 
         this.thisTransform.GetChild(0).gameObject.SetActive(false);
         

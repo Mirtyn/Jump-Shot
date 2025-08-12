@@ -51,7 +51,7 @@ public class Tankon : BaseEnemy
         Vector2 pos = thisTransform.position + playerDir * 4f;
         shot.Play();
         var obj = Instantiate(GameManager.EnemyBulletPrefab, pos, Quaternion.identity);
-        obj.GetComponent<EnemyBullet>().SetStats(10f, 2, new Vector3(0.8f, 0.5f, 1f), playerDir);
+        obj.GetComponent<EnemyBullet>().SetStats(10f, 2, new Vector3(1.4f, 1.4f, 1f), playerDir);
     }
 
     public override void PlaceAmmo()
