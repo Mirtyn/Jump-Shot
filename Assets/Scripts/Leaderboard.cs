@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using Dan.Main;
 using TMPro;
-using UnityEngine.SceneManagement;
 
 public class Leaderboard : ProjectBehaviour
 {
@@ -47,6 +46,6 @@ public class Leaderboard : ProjectBehaviour
 
     public void ReStart()
     {
-        ReLoae();
+        ReLoad();
     }
 }

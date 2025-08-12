@@ -12,7 +12,7 @@ public class ProjectBehaviour : MonoBehaviour
         GameManager.ShowLeaderboard();
     }
 
-    public void ReLoae()
+    public void ReLoad()
     {
         SceneManager.LoadScene(0);
     }
