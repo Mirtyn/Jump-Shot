@@ -70,3 +70,7 @@ crashlytics-build.properties
 # Temporary auto-generated Android Assets
 /[Aa]ssets/[Ss]treamingAssets/aa.meta
 /[Aa]ssets/[Ss]treamingAssets/aa/*
+/Assets/Packages/vHierarchy
+/Assets/Packages/FolderColor
+/Assets/Packages/FolderColor.meta
+/Assets/Packages/vHierarchy.meta
